@@ -1,0 +1,1 @@
+import{Fa as n,Ua as o,Va as a,lb as i}from"./chunk-ZAWNPOR3.js";var r=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=n({type:t,selectors:[["app-unauthorized"]],decls:2,vars:0,template:function(e,m){e&1&&(o(0,"p"),i(1,"unauthorized works!"),a())},encapsulation:2})};export{r as UnauthorizedComponent};
