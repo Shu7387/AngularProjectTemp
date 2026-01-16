@@ -1,0 +1,182 @@
+<div class="container-fluid p-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Edit Patient (Template-Driven Form)</h4>
+    </div>
+
+    <div class="card-body">
+      <!-- Loading Indicator -->
+      <div *ngIf="loading()" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading patient details...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = null"></button>
+      </div>
+
+      <!-- Success Message -->
+      <div
+        *ngIf="successMessage"
+        class="alert alert-success alert-dismissible fade show"
+        role="alert"
+      >
+        <i class="bi bi-check-circle-fill me-2"></i>
+        {{ successMessage }}
+        <button type="button" class="btn-close" (click)="successMessage = null"></button>
+      </div>
+
+      <!-- Patient Info (Read-only fields) -->
+      <div *ngIf="originalPatient && !loading()" class="alert alert-secondary mb-4">
+        <h6 class="mb-2">Read-Only Information</h6>
+        <div class="row">
+          <div class="col-md-3"><strong>Name:</strong> {{ originalPatient.name }}</div>
+          <div class="col-md-2"><strong>DOB:</strong> {{ originalPatient.dateOfBirth }}</div>
+          <div class="col-md-2"><strong>Gender:</strong> {{ originalPatient.gender }}</div>
+          <div class="col-md-2"><strong>Blood:</strong> {{ originalPatient.bloodGroup }}</div>
+          <div class="col-md-3"><strong>Last Visit:</strong> {{ originalPatient.lastVisit }}</div>
+        </div>
+      </div>
+
+      <!-- Template-Driven Form (Editable fields) -->
+      <form #editForm="ngForm" (ngSubmit)="onSubmit(editForm)" *ngIf="!loading()">
+        <h5 class="border-bottom pb-2 mb-3">Editable Fields</h5>
+
+        <div class="row g-3">
+          <!-- Email -->
+          <div class="col-md-6">
+            <label for="email" class="form-label"> Email <span class="text-danger">*</span> </label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              [(ngModel)]="editablePatient.email"
+              #emailField="ngModel"
+              required
+              email
+              [class.is-invalid]="emailField.invalid && emailField.touched"
+              [class.is-valid]="emailField.valid && emailField.touched"
+            />
+            <div class="invalid-feedback" *ngIf="emailField.invalid && emailField.touched">
+              <div *ngIf="emailField.errors?.['required']">Email is required</div>
+              <div *ngIf="emailField.errors?.['email']">Please enter a valid email</div>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="col-md-6">
+            <label for="phone" class="form-label"> Phone <span class="text-danger">*</span> </label>
+            <input
+              type="tel"
+              class="form-control"
+              id="phone"
+              name="phone"
+              [(ngModel)]="editablePatient.phone"
+              #phoneField="ngModel"
+              required
+              pattern="^[0-9]{10}$"
+              [class.is-invalid]="phoneField.invalid && phoneField.touched"
+              [class.is-valid]="phoneField.valid && phoneField.touched"
+            />
+            <div class="invalid-feedback" *ngIf="phoneField.invalid && phoneField.touched">
+              <div *ngIf="phoneField.errors?.['required']">Phone is required</div>
+              <div *ngIf="phoneField.errors?.['pattern']">Phone must be 10 digits</div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="col-12">
+            <label for="address" class="form-label">
+              Address <span class="text-danger">*</span>
+            </label>
+            <textarea
+              class="form-control"
+              id="address"
+              name="address"
+              rows="2"
+              [(ngModel)]="editablePatient.address"
+              #addressField="ngModel"
+              required
+              minlength="10"
+              [class.is-invalid]="addressField.invalid && addressField.touched"
+              [class.is-valid]="addressField.valid && addressField.touched"
+            ></textarea>
+            <div class="invalid-feedback" *ngIf="addressField.invalid && addressField.touched">
+              <div *ngIf="addressField.errors?.['required']">Address is required</div>
+              <div *ngIf="addressField.errors?.['minlength']">
+                Address must be at least 10 characters
+              </div>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="col-md-4">
+            <label for="status" class="form-label">
+              Status <span class="text-danger">*</span>
+            </label>
+            <select
+              class="form-select"
+              id="status"
+              name="status"
+              [(ngModel)]="editablePatient.status"
+              #statusField="ngModel"
+              required
+              [class.is-invalid]="statusField.invalid && statusField.touched"
+              [class.is-valid]="statusField.valid && statusField.touched"
+            >
+              <option value="">Select Status</option>
+              <option *ngFor="let status of statusOptions" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="statusField.invalid && statusField.touched">
+              Status is required
+            </div>
+          </div>
+
+          <!-- Current Medication -->
+          <div class="col-md-6">
+            <label for="currentMedication" class="form-label"> Current Medication </label>
+            <input
+              type="text"
+              class="form-control"
+              id="currentMedication"
+              name="currentMedication"
+              [(ngModel)]="editablePatient.currentMedication"
+              placeholder="e.g., Aspirin, Insulin"
+            />
+            <small class="text-muted">Optional field</small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="onCancel()"
+            [disabled]="loading()"
+          >
+            <i class="bi bi-x-circle me-1"></i>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="editForm.invalid || loading() || !hasChanges()"
+          >
+            <span *ngIf="loading()" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!loading()" class="bi bi-check-circle me-1"></i>
+            {{ loading() ? 'Updating...' : 'Update Patient' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

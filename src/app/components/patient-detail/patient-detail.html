@@ -1,0 +1,190 @@
+<div class="card shadow">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <h3 class="mb-0"><i class="bi bi-person-badge"></i> Patient Details</h3>
+    <!-- Event binding - emit close event to parent -->
+    <button (click)="onClose()" class="btn btn-light btn-sm">
+      <i class="bi bi-x-lg"></i> Close
+    </button>
+  </div>
+
+  <div class="card-body">
+    <!-- Patient Header -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <h2 class="mb-3">
+          <!-- Interpolation -->
+          {{ patient.firstName }} {{ patient.lastName }}
+        </h2>
+        <div class="mb-2">
+          <span class="badge fs-6" [ngClass]="getStatusBadgeClass(patient.status)">
+            <!-- Custom pipe -->
+            {{ patient.status | patientStatus }}
+          </span>
+        </div>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="alert alert-info mb-0">
+          <strong>Patient ID:</strong><br />
+          <span class="h4">#{{ patient.id }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Personal Information Section -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-person-circle"></i> Personal Information</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-sm table-borderless mb-0">
+            <tbody>
+              <tr>
+                <th width="40%">Age:</th>
+                <!-- Custom pipe - ageCalculator -->
+                <td>{{ patient.dateOfBirth | ageCalculator : true }} years</td>
+              </tr>
+              <tr>
+                <th>Date of Birth:</th>
+                <!-- Built-in pipe - date -->
+                <td>{{ patient.dateOfBirth | date : 'fullDate' }}</td>
+              </tr>
+              <tr>
+                <th>Gender:</th>
+                <td>{{ patient.gender }}</td>
+              </tr>
+              <tr>
+                <th>Blood Group:</th>
+                <td>
+                  <span class="badge bg-danger">{{ patient.bloodGroup }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Contact Information</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-sm table-borderless mb-0">
+            <tbody>
+              <tr>
+                <th width="40%">Email:</th>
+                <!-- Built-in pipe - lowercase -->
+                <td>
+                  <a [href]="'mailto:' + patient.email">{{ patient.email | lowercase }}</a>
+                </td>
+              </tr>
+              <tr>
+                <th>Phone:</th>
+                <td>
+                  <a [href]="'tel:' + patient.phone">{{ patient.phone }}</a>
+                </td>
+              </tr>
+              <tr>
+                <th>Address:</th>
+                <td>{{ patient.address }}</td>
+              </tr>
+              <tr>
+                <th>Last Visit:</th>
+                <!-- Built-in pipe - date with custom format -->
+                <td>{{ patient.lastVisit | date : 'MMMM dd, yyyy' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical Information Section -->
+  <div class="row">
+    <div class="col-12 mb-4">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-clipboard2-pulse"></i> Medical History</h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-0">{{ patient.medicalHistory }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Allergies Section -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card bg-light">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Allergies</h5>
+        </div>
+        <div class="card-body">
+          <!-- Using *ngIf directive -->
+          <div *ngIf="patient.allergies.length > 0; else noAllergies">
+            <ul class="list-group list-group-flush">
+              <!-- Using *ngFor directive -->
+              <li *ngFor="let allergy of patient.allergies" class="list-group-item bg-transparent">
+                <i class="bi bi-dot text-danger"></i> {{ allergy }}
+              </li>
+            </ul>
+          </div>
+          <ng-template #noAllergies>
+            <p class="text-muted mb-0">
+              <i class="bi bi-check-circle text-success"></i> No known allergies
+            </p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Medications Section -->
+    <div class="col-md-6 mb-4">
+      <div class="card bg-light">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="bi bi-capsule"></i> Current Medications</h5>
+        </div>
+        <div class="card-body">
+          <!-- Using *ngIf directive with else -->
+          <div *ngIf="patient.currentMedications.length > 0; else noMedications">
+            <ul class="list-group list-group-flush">
+              <!-- Using *ngFor directive with index -->
+              <li
+                *ngFor="let medication of patient.currentMedications; let i = index"
+                class="list-group-item bg-transparent"
+              >
+                <strong>{{ i + 1 }}.</strong> {{ medication }}
+              </li>
+            </ul>
+          </div>
+          <ng-template #noMedications>
+            <p class="text-muted mb-0">
+              <i class="bi bi-check-circle text-success"></i> No current medications
+            </p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-outline-primary" [routerLink]="['../edit-patient', patient.id]">
+          <i class="bi bi-pencil"></i> Edit Patient, {{ patient.id }}
+        </button>
+        <button class="btn btn-outline-success"><i class="bi bi-printer"></i> Print Record</button>
+        <button (click)="onClose()" class="btn btn-secondary">
+          <i class="bi bi-arrow-left"></i> Back to List
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

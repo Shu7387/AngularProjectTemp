@@ -1,0 +1,37 @@
+<div
+  class="appointment-card"
+  [class.highlighted]="isHighlighted"
+  [ngClass]="getCardClass()"
+  (click)="onClick()"
+>
+  <!-- Specific projected content -->
+  <div class="card-header">
+    <ng-content select="[card-header]"></ng-content>
+  </div>
+
+  <div class="card-body">
+    <h6 class="mb-2">{{ appointment.patientName }}</h6>
+
+    <div class="appointment-details">
+      <small>
+        <i class="bi bi-clock"></i>
+        {{ appointment.appointmentTime }} ({{ appointment.duration }}min)
+      </small>
+      <br />
+      <small>
+        <i class="bi bi-hospital"></i>
+        Room {{ appointment.roomNumber || 'TBD' }}
+      </small>
+      <br />
+      <small>
+        <i class="bi bi-tag"></i>
+        {{ appointment.type }}
+      </small>
+    </div>
+
+    <span class="badge" [ngClass]="getStatusClass()">{{ appointment.status }}</span>
+
+    <!-- Default slot for additional projected content -->
+    <ng-content></ng-content>
+  </div>
+</div>

@@ -1,0 +1,372 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Add New Patient (Reactive Form)</h4>
+    </div>
+    <div class="card-body">
+      <!-- Reactive Form -->
+      <form [formGroup]="reactiveForm" (ngSubmit)="onReactiveSubmit()">
+        <!-- Basic Information -->
+        <h5 class="text-secondary mb-3">Basic Information</h5>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="firstName" class="form-label">First Name *</label>
+            <input
+              type="text"
+              id="firstName"
+              class="form-control"
+              formControlName="firstName"
+              [class.is-invalid]="
+                reactiveForm.get('firstName')?.invalid && reactiveForm.get('firstName')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="
+                reactiveForm.get('firstName')?.invalid && reactiveForm.get('firstName')?.touched
+              "
+            >
+              <div *ngIf="reactiveForm.get('firstName')?.errors?.['required']">
+                First name is required
+              </div>
+              <div *ngIf="reactiveForm.get('firstName')?.errors?.['minlength']">
+                Minimum 2 characters required
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="lastName" class="form-label">Last Name *</label>
+            <input
+              type="text"
+              id="lastName"
+              class="form-control"
+              formControlName="lastName"
+              [class.is-invalid]="
+                reactiveForm.get('lastName')?.invalid && reactiveForm.get('lastName')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="reactiveForm.get('lastName')?.invalid && reactiveForm.get('lastName')?.touched"
+            >
+              <div *ngIf="reactiveForm.get('lastName')?.errors?.['required']">
+                Last name is required
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="dateOfBirth" class="form-label">Date of Birth *</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              class="form-control"
+              formControlName="dateOfBirth"
+              [class.is-invalid]="
+                reactiveForm.get('dateOfBirth')?.invalid && reactiveForm.get('dateOfBirth')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="
+                reactiveForm.get('dateOfBirth')?.invalid && reactiveForm.get('dateOfBirth')?.touched
+              "
+            >
+              <div *ngIf="reactiveForm.get('dateOfBirth')?.errors?.['required']">
+                Date of birth is required
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="gender" class="form-label">Gender *</label>
+            <select
+              id="gender"
+              class="form-select"
+              formControlName="gender"
+              [class.is-invalid]="
+                reactiveForm.get('gender')?.invalid && reactiveForm.get('gender')?.touched
+              "
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <div
+              class="invalid-feedback"
+              *ngIf="reactiveForm.get('gender')?.invalid && reactiveForm.get('gender')?.touched"
+            >
+              Gender is required
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="bloodGroup" class="form-label">Blood Group *</label>
+            <input
+              type="text"
+              id="bloodGroup"
+              class="form-control"
+              formControlName="bloodGroup"
+              placeholder="e.g., A+, O-, AB+"
+              [class.is-invalid]="
+                reactiveForm.get('bloodGroup')?.invalid && reactiveForm.get('bloodGroup')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="
+                reactiveForm.get('bloodGroup')?.invalid && reactiveForm.get('bloodGroup')?.touched
+              "
+            >
+              <div *ngIf="reactiveForm.get('bloodGroup')?.errors?.['required']">
+                Blood group is required
+              </div>
+              <div *ngIf="reactiveForm.get('bloodGroup')?.errors?.['invalidBloodGroup']">
+                Invalid blood group (e.g., A+, O-, AB+)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <h5 class="text-secondary mb-3 mt-4">Contact Information</h5>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email *</label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              formControlName="email"
+              [class.is-invalid]="
+                reactiveForm.get('email')?.invalid && reactiveForm.get('email')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="reactiveForm.get('email')?.invalid && reactiveForm.get('email')?.touched"
+            >
+              <div *ngIf="reactiveForm.get('email')?.errors?.['required']">Email is required</div>
+              <div *ngIf="reactiveForm.get('email')?.errors?.['email']">Invalid email format</div>
+              <div *ngIf="reactiveForm.get('email')?.errors?.['emailExists']">
+                Email already exists
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone *</label>
+            <input
+              type="tel"
+              id="phone"
+              class="form-control"
+              formControlName="phone"
+              placeholder="(123) 456-7890"
+              [class.is-invalid]="
+                reactiveForm.get('phone')?.invalid && reactiveForm.get('phone')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="reactiveForm.get('phone')?.invalid && reactiveForm.get('phone')?.touched"
+            >
+              <div *ngIf="reactiveForm.get('phone')?.errors?.['required']">Phone is required</div>
+              <div *ngIf="reactiveForm.get('phone')?.errors?.['invalidPhone']">
+                Invalid phone format (123-456-7890)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="address" class="form-label">Address *</label>
+          <textarea
+            id="address"
+            class="form-control"
+            formControlName="address"
+            rows="2"
+            [class.is-invalid]="
+              reactiveForm.get('address')?.invalid && reactiveForm.get('address')?.touched
+            "
+          ></textarea>
+          <div
+            class="invalid-feedback"
+            *ngIf="reactiveForm.get('address')?.invalid && reactiveForm.get('address')?.touched"
+          >
+            Address is required
+          </div>
+        </div>
+
+        <!-- Medical Information -->
+        <h5 class="text-secondary mb-3 mt-4">Medical Information</h5>
+
+        <div class="mb-3">
+          <label class="form-label d-flex justify-content-between align-items-center">
+            <span>Allergies</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addAllergy()">
+              <i class="bi bi-plus-circle"></i> Add Allergy
+            </button>
+          </label>
+          <div formArrayName="allergies">
+            <div *ngFor="let allergy of allergies.controls; let i = index" class="input-group mb-2">
+              <input
+                type="text"
+                class="form-control"
+                [formControlName]="i"
+                placeholder="Enter allergy"
+              />
+              <button type="button" class="btn btn-outline-danger" (click)="removeAllergy(i)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <small class="text-muted">Add any known allergies</small>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label d-flex justify-content-between align-items-center">
+            <span>Current Medications</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addMedication()">
+              <i class="bi bi-plus-circle"></i> Add Medication
+            </button>
+          </label>
+          <div formArrayName="currentMedications">
+            <div
+              *ngFor="let med of currentMedications.controls; let i = index"
+              class="input-group mb-2"
+            >
+              <input
+                type="text"
+                class="form-control"
+                [formControlName]="i"
+                placeholder="Enter medication"
+              />
+              <button type="button" class="btn btn-outline-danger" (click)="removeMedication(i)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <small class="text-muted">Add current medications</small>
+        </div>
+
+        <!-- Emergency Contact -->
+        <h5 class="text-secondary mb-3 mt-4">Emergency Contact</h5>
+        <div formGroupName="emergencyContact">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="emergencyName" class="form-label">Contact Name *</label>
+              <input
+                type="text"
+                id="emergencyName"
+                class="form-control"
+                formControlName="name"
+                [class.is-invalid]="
+                  reactiveForm.get('emergencyContact.name')?.invalid &&
+                  reactiveForm.get('emergencyContact.name')?.touched
+                "
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  reactiveForm.get('emergencyContact.name')?.invalid &&
+                  reactiveForm.get('emergencyContact.name')?.touched
+                "
+              >
+                Emergency contact name is required
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="emergencyRelation" class="form-label">Relationship *</label>
+              <input
+                type="text"
+                id="emergencyRelation"
+                class="form-control"
+                formControlName="relation"
+                [class.is-invalid]="
+                  reactiveForm.get('emergencyContact.relation')?.invalid &&
+                  reactiveForm.get('emergencyContact.relation')?.touched
+                "
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  reactiveForm.get('emergencyContact.relation')?.invalid &&
+                  reactiveForm.get('emergencyContact.relation')?.touched
+                "
+              >
+                Relationship is required
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="emergencyPhone" class="form-label">Contact Phone *</label>
+            <input
+              type="tel"
+              id="emergencyPhone"
+              class="form-control"
+              formControlName="phone"
+              placeholder="(123) 456-7890"
+              [class.is-invalid]="
+                reactiveForm.get('emergencyContact.phone')?.invalid &&
+                reactiveForm.get('emergencyContact.phone')?.touched
+              "
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="
+                reactiveForm.get('emergencyContact.phone')?.invalid &&
+                reactiveForm.get('emergencyContact.phone')?.touched
+              "
+            >
+              <div *ngIf="reactiveForm.get('emergencyContact.phone')?.errors?.['required']">
+                Emergency contact phone is required
+              </div>
+              <div *ngIf="reactiveForm.get('emergencyContact.phone')?.errors?.['invalidPhone']">
+                Invalid phone format
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit/Cancel Buttons -->
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="reactiveForm.invalid || isSubmitting()"
+          >
+            <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isSubmitting() ? 'Submitting...' : 'Add Patient' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Success Message -->
+      <div *ngIf="submitSuccess" class="alert alert-success mt-3">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        Patient added successfully!
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="submitError" class="alert alert-danger mt-3 alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ submitError }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="submitError = null"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>

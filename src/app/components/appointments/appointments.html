@@ -1,0 +1,252 @@
+<div class="appointments-container p-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2><i class="bi bi-calendar-check"></i> Appointment Scheduling</h2>
+      <p class="text-muted mb-0">Phase 3: Advanced Component Features Demo</p>
+    </div>
+    <div>
+      <button class="btn btn-info btn-sm me-2" (click)="highlightTodaySchedule()">
+        <i class="bi bi-lightbulb"></i> Highlight Today
+      </button>
+      <button class="btn btn-warning btn-sm me-2" (click)="highlightAllAppointments()">
+        <i class="bi bi-stars"></i> Highlight All
+      </button>
+      <button class="btn btn-secondary btn-sm" (click)="getAppointmentCardsInfo()">
+        <i class="bi bi-info-circle"></i> ViewChildren Info
+      </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    <i class="bi bi-check-circle"></i> {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = null"></button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
+    <i class="bi bi-exclamation-triangle"></i> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = null"></button>
+  </div>
+
+  <div class="row">
+    <!-- Left Column: Appointment Form -->
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Schedule New Appointment</h5>
+        </div>
+        <div class="card-body">
+          <!-- ViewChild Demo: Form element reference -->
+          <form #appointmentFormElement [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+            <!-- Patient Selection -->
+            <div class="mb-3">
+              <label class="form-label">Patient *</label>
+              <select class="form-select" formControlName="patientId">
+                <option value="">Select Patient</option>
+                <option *ngFor="let patient of patients" [value]="patient.id">
+                  {{ patient.firstName }} {{ patient.lastName }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Date Selection with ViewChild reference -->
+            <div class="mb-3">
+              <label class="form-label">Appointment Date *</label>
+              <input
+                #selectedDateInput
+                type="date"
+                class="form-control"
+                formControlName="appointmentDate"
+                (change)="onDateChange()"
+              />
+              <small class="text-muted">
+                <i class="bi bi-info-circle"></i> ViewChild: Date input reference
+              </small>
+            </div>
+
+            <!-- Time Selection -->
+            <div class="mb-3">
+              <label class="form-label">Time *</label>
+              <input type="time" class="form-control" formControlName="appointmentTime" />
+            </div>
+
+            <!-- Duration -->
+            <div class="mb-3">
+              <label class="form-label">Duration (minutes) *</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="duration"
+                min="15"
+                step="15"
+              />
+            </div>
+
+            <!-- Type -->
+            <div class="mb-3">
+              <label class="form-label">Type *</label>
+              <select class="form-select" formControlName="type">
+                <option *ngFor="let type of appointmentTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+
+            <!-- Room Number -->
+            <div class="mb-3">
+              <label class="form-label">Room Number</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="roomNumber"
+                placeholder="e.g., 101"
+              />
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-3">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" formControlName="notes" rows="2"></textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary" [disabled]="appointmentForm.invalid">
+                <i class="bi bi-calendar-plus"></i> Schedule
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="resetFormViaViewChild()">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-info btn-sm ms-auto"
+                (click)="focusDateInput()"
+              >
+                <i class="bi bi-cursor"></i> Focus Date
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Time Slots Grid - ViewChildren Demo -->
+      <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0">
+            <i class="bi bi-clock"></i> Available Time Slots - {{ selectedDate }}
+            <small class="float-end">@HostListener/@HostBinding Demo</small>
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="time-slots-grid">
+            <!-- ViewChildren: Multiple TimeSlot components -->
+            <app-time-slot
+              *ngFor="let slot of availableTimeSlots"
+              [slot]="slot"
+              (slotClicked)="onTimeSlotClick($event)"
+            ></app-time-slot>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Appointments List -->
+    <div class="col-lg-7">
+      <!-- Today's Schedule - ViewChild Demo -->
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-calendar-day"></i> Today's Schedule
+            <small class="float-end">@ViewChild Demo</small>
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="getTodayAppointments().length === 0" class="text-center text-muted py-3">
+            <i class="bi bi-calendar-x display-4"></i>
+            <p class="mt-2">No appointments scheduled for today</p>
+          </div>
+
+          <!-- ViewChild: Single component reference (#todaySchedule) -->
+          <app-appointment-card
+            #todaySchedule
+            *ngFor="let apt of getTodayAppointments()"
+            [appointment]="apt"
+          >
+            <!-- ng-content projection: card-header slot -->
+            <div card-header><i class="bi bi-person-circle"></i> Dr. {{ apt.doctorName }}</div>
+            <!-- ng-content projection: default slot -->
+            <p class="mb-0 mt-2 small text-muted" *ngIf="apt.notes">
+              <i class="bi bi-journal-text"></i> {{ apt.notes }}
+            </p>
+          </app-appointment-card>
+        </div>
+      </div>
+
+      <!-- All Upcoming Appointments - ViewChildren Demo -->
+      <div class="card">
+        <div class="card-header bg-warning">
+          <h5 class="mb-0">
+            <i class="bi bi-calendar2-range"></i> Upcoming Appointments
+            <small class="float-end">@ViewChildren Demo</small>
+          </h5>
+        </div>
+        <div class="card-body" style="max-height: 400px; overflow-y: auto">
+          <div *ngIf="getUpcomingAppointments().length === 0" class="text-center text-muted py-3">
+            <i class="bi bi-calendar-x display-4"></i>
+            <p class="mt-2">No upcoming appointments</p>
+          </div>
+
+          <!-- ViewChildren: Multiple component references (allAppointmentCards) -->
+          <app-appointment-card *ngFor="let apt of getUpcomingAppointments()" [appointment]="apt">
+            <!-- Demonstrating ng-content projection -->
+            <div card-header><i class="bi bi-calendar-event"></i> {{ apt.appointmentDate }}</div>
+            <div class="mt-2">
+              <small class="text-muted">
+                <i class="bi bi-person"></i> Dr. {{ apt.doctorName }}
+              </small>
+            </div>
+          </app-appointment-card>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Info Panel -->
+  <div class="card mt-4 bg-light">
+    <div class="card-body">
+      <h6><i class="bi bi-info-circle"></i> Advanced Features Demonstrated:</h6>
+      <div class="row">
+        <div class="col-md-3">
+          <strong>@ViewChild:</strong>
+          <ul class="small mb-0">
+            <li>Form element reference</li>
+            <li>Date input access</li>
+            <li>Today's schedule card</li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <strong>@ViewChildren:</strong>
+          <ul class="small mb-0">
+            <li>All appointment cards</li>
+            <li>Time slot components</li>
+            <li>QueryList operations</li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <strong>@ContentChild:</strong>
+          <ul class="small mb-0">
+            <li>Card header projection</li>
+            <li>Card action projection</li>
+            <li>Flexible content slots</li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <strong>ng-content:</strong>
+          <ul class="small mb-0">
+            <li>Multi-slot projection</li>
+            <li>Header/body slots</li>
+            <li>Flexible layouts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

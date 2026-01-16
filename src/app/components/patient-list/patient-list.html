@@ -1,0 +1,292 @@
+<div class="container-fluid py-4">
+  <!-- Header Section with Interpolation -->
+  <header class="text-center mb-4">
+    <div class="bg-gradient text-white p-4 rounded shadow">
+      <h1 class="display-4 mb-2">{{ componentTitle }}</h1>
+      <p class="lead mb-0">Comprehensive Patient Records Management</p>
+    </div>
+  </header>
+
+  <!-- #region Patient list page -->
+
+  <!-- Controls Section - Demonstrating Property Binding, Event Binding, Two-way Binding -->
+  <div class="card shadow-sm mb-4" *ngIf="!selectedPatient && !showAddForm && !showEditForm">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <!-- Two-way data binding with ngModel -->
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchChange()"
+              placeholder="Search by name or email..."
+              class="form-control"
+              [disabled]="isLoading()"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="input-group">
+            <label class="input-group-text" for="statusFilter">Status:</label>
+            <!-- Event binding with (change) -->
+            <select
+              id="statusFilter"
+              [value]="filterStatus"
+              (change)="onFilterChange($event)"
+              class="form-select"
+              [disabled]="isLoading()"
+            >
+              <option value="all">All Patients</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-5 text-end">
+          <!-- Property binding and Event binding -->
+          <button
+            (click)="onRefreshPatients()"
+            [disabled]="isLoading()"
+            class="btn btn-success me-2"
+          >
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
+
+          <button
+            (click)="onToggleAddForm()"
+            [disabled]="isLoading() && selectedPatient"
+            class="btn btn-primary"
+          >
+            <i class="bi bi-plus-circle"></i> Add Patient
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Section - Interpolation -->
+  <div class="row g-3 mb-4" *ngIf="!selectedPatient && !showAddForm && !showEditForm">
+    <div class="col-md-4">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">Total Patients</h6>
+          <h2 class="card-title text-primary mb-0">{{ totalPatients }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">Filtered Results</h6>
+          <h2 class="card-title text-success mb-0">{{ filteredPatients.length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">Search Term</h6>
+          <h2 class="card-title text-info mb-0">{{ searchTerm || 'None' }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Indicator - Using *ngIf directive -->
+  <div *ngIf="isLoading()" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading patients...</p>
+  </div>
+
+  <!-- Patient List - Using built-in directives -->
+  <div *ngIf="!isLoading() && !selectedPatient && !showAddForm && !showEditForm">
+    <div class="row g-4">
+      <!-- *ngFor directive with trackBy -->
+      <div
+        *ngFor="let patient of filteredPatients; trackBy: trackByPatientId; let i = index"
+        class="col-lg-4 col-md-6"
+      >
+        <!-- Custom directive - appHighlight -->
+        <div
+          class="card h-100 shadow-sm"
+          [appHighlight]="patient.status.toLowerCase() === 'critical' ? '#ffe6e6' : '#e6f3ff'"
+          [defaultColor]="'white'"
+          (click)="onViewPatient(patient)"
+          [appTooltip]="'Click to view details for ' + patient.firstName + ' ' + patient.lastName"
+          style="cursor: pointer; transition: transform 0.2s"
+          [style.transform]="'scale(1)'"
+        >
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              <!-- Interpolation -->
+              {{ patient.firstName }} {{ patient.lastName }}
+            </h5>
+            <!-- Custom pipe usage -->
+            <span [class]="'badge ' + getStatusBadgeClass(patient.status)">
+              {{ patient.status | patientStatus }}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <div class="mb-2">
+              <strong class="text-muted">Age:</strong>
+              <!-- Custom pipe - ageCalculator -->
+              <span class="float-end">{{ patient.dateOfBirth | ageCalculator : true }} years</span>
+            </div>
+
+            <div class="mb-2">
+              <strong class="text-muted">Blood Group:</strong>
+              <span class="float-end">{{ patient.bloodGroup }}</span>
+            </div>
+
+            <div class="mb-2">
+              <strong class="text-muted">Last Visit:</strong>
+              <!-- Built-in pipe - date -->
+              <span class="float-end">{{ patient.lastVisit | date : 'MMM dd, yyyy' }}</span>
+            </div>
+
+            <div class="mb-2">
+              <strong class="text-muted">Email:</strong>
+              <!-- Built-in pipe - lowercase -->
+              <span class="float-end text-break">{{ patient.email | lowercase }}</span>
+            </div>
+
+            <!-- Using *ngIf directive -->
+            <div class="mb-2" *ngIf="patient.allergies.length > 0">
+              <strong class="text-muted">Allergies:</strong>
+              <span class="float-end text-danger fw-bold"
+                >{{ patient.allergies.length }} allergy(ies)</span
+              >
+            </div>
+
+            <!-- Using *ngIf with else -->
+            <div class="mb-2">
+              <strong class="text-muted">Medications:</strong>
+              <span *ngIf="patient.currentMedications.length > 0; else noMeds" class="float-end">
+                {{ patient.currentMedications.length }} medication(s)
+              </span>
+              <ng-template #noMeds>
+                <span class="float-end text-muted">None</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div
+            class="card-footer bg-transparent d-flex justify-content-end gap-2"
+            (click)="$event.stopPropagation()"
+          >
+            <!-- Edit Button -->
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="onEditPatient(patient)"
+            >
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+
+            <!-- Delete Button -->
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="onDeletePatient(patient)"
+            >
+              <i class="bi bi-trash"></i> Delete
+            </button>
+
+            <!-- View Details Button -->
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              (click)="onViewPatient(patient)"
+            >
+              <i class="bi bi-arrow-right"></i> View Details
+              <small class="text-muted">#{{ patient.id }}</small>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state - Using *ngIf directive -->
+      <div *ngIf="filteredPatients.length === 0" class="text-center py-5">
+        <div class="alert alert-info d-inline-block">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>No patients found matching your criteria.</strong>
+        </div>
+        <div class="mt-3">
+          <button
+            (click)="searchTerm = ''; filterStatus = 'all'; filterPatients()"
+            class="btn btn-secondary"
+          >
+            <i class="bi bi-x-circle"></i> Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demonstrating ngSwitch directive -->
+    <div
+      class="alert alert-light mt-4"
+      *ngIf="!isLoading() && !selectedPatient && !showAddForm && !showEditForm"
+    >
+      <h5 class="alert-heading"><i class="bi bi-info-circle"></i> Patient Status Legend:</h5>
+      <div [ngSwitch]="filterStatus">
+        <p class="mb-0" *ngSwitchCase="'active'">
+          <i class="bi bi-check-circle text-success"></i> Showing only active patients
+        </p>
+        <p class="mb-0" *ngSwitchCase="'inactive'">
+          <i class="bi bi-dash-circle text-secondary"></i> Showing only inactive patients
+        </p>
+        <p class="mb-0" *ngSwitchCase="'critical'">
+          <i class="bi bi-exclamation-triangle text-danger"></i> Showing only critical patients
+        </p>
+        <p class="mb-0" *ngSwitchDefault>
+          <i class="bi bi-list-ul text-primary"></i> Showing all patients regardless of status
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- #endregion Patient list page -->
+
+  <!-- #region Patient details page -->
+
+  <!-- Patient Detail View - Using *ngIf directive -->
+  <div *ngIf="showPatientDetails && selectedPatient">
+    <app-patient-detail
+      [patient]="selectedPatient"
+      (closeDetail)="onCloseDetail()"
+    ></app-patient-detail>
+  </div>
+  <!-- #endregion Patient details page -->
+
+  <!-- #region Add Patient Form -->
+
+  <!-- Add Patient Form - Phase 2 (Reactive Form) -->
+  <div *ngIf="showAddForm" class="mb-4">
+    <app-add-patient
+      (patientAdded)="onPatientAdded()"
+      (cancelled)="onCancelAddForm()"
+    ></app-add-patient>
+  </div>
+  <!-- #endregion Add Patient Form -->
+
+  <!-- #region Edit Patient Form -->
+
+  <!-- Edit Patient Form - Phase 2 (Template-Driven Form) -->
+
+  <div *ngIf="showEditForm" class="mb-4">
+    <app-edit-patient
+      [patientId]="editingPatientId || 1"
+      [useRoutingCancel]="false"
+      (patientUpdated)="onPatientUpdated($event)"
+      (cancelled)="onCancelEditForm()"
+    ></app-edit-patient>
+  </div>
+  <!-- #endregion Edit Patient Form -->
+</div>
