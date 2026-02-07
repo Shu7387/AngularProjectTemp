@@ -10,7 +10,7 @@ import { Patient } from '../models/patient.model';
 })
 export class PatientService {
   /** Base API endpoint served by JSON Server */
-  private readonly apiUrl = 'http://localhost:3000/patients';
+  private readonly apiUrl: string = 'http://localhost:3000/patients';
 
   constructor(private http: HttpClient) {
     console.log('PatientService initialized - using JSON Server API');
@@ -21,7 +21,7 @@ export class PatientService {
     return this.http.get<Patient[]>(this.apiUrl).pipe(
       retry(2), // retry transient failures up to 2 times
       tap((patients) => console.log('Patients fetched from API:', patients.length)),
-      catchError(this.handleError)
+      catchError(this.handleError),
     );
   }
 
@@ -30,7 +30,7 @@ export class PatientService {
     return this.http.get<Patient>(`${this.apiUrl}/${id}`).pipe(
       retry(1),
       tap((patient) => console.log('Patient fetched:', patient)),
-      catchError(this.handleError)
+      catchError(this.handleError),
     );
   }
 
@@ -41,7 +41,7 @@ export class PatientService {
 
     return this.http.post<Patient>(this.apiUrl, patient, this.jsonOptions()).pipe(
       tap((newPatient) => console.log('Patient created:', newPatient)),
-      catchError(this.handleError)
+      catchError(this.handleError),
     );
   }
 
@@ -49,7 +49,7 @@ export class PatientService {
   public updatePatient(id: number | string, patient: Partial<Patient>): Observable<Patient> {
     return this.http.put<Patient>(`${this.apiUrl}/${id}`, patient, this.jsonOptions()).pipe(
       tap((updatedPatient) => console.log('Patient updated:', updatedPatient)),
-      catchError(this.handleError)
+      catchError(this.handleError),
     );
   }
 
@@ -57,7 +57,7 @@ export class PatientService {
   public deletePatient(id: number | string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => console.log('Patient deleted:', id)),
-      catchError(this.handleError)
+      catchError(this.handleError),
     );
   }
 
@@ -74,9 +74,9 @@ export class PatientService {
           (p) =>
             p.firstName?.toLowerCase().includes(q) ||
             p.lastName?.toLowerCase().includes(q) ||
-            p.email?.toLowerCase().includes(q)
+            p.email?.toLowerCase().includes(q),
         );
-      })
+      }),
     );
   }
 
@@ -86,14 +86,16 @@ export class PatientService {
    */
   public filterByStatus(status: string): Observable<Patient[]> {
     return this.getAllPatients().pipe(
-      map((patients) => (status === 'all' ? patients : patients.filter((p) => p.status === status)))
+      map((patients) =>
+        status === 'all' ? patients : patients.filter((p) => p.status === status),
+      ),
     );
   }
 
   /** Convenience: get only 'critical' patients (client-side) */
   public getCriticalPatients(): Observable<Patient[]> {
     return this.getAllPatients().pipe(
-      map((patients) => patients.filter((p) => p.status === 'critical'))
+      map((patients) => patients.filter((p) => p.status === 'critical')),
     );
   }
 

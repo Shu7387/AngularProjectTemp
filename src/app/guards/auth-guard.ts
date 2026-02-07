@@ -26,6 +26,9 @@ export const authGuard: CanActivateFn = (route, state) => {
  * Role Guard - Protects routes based on user roles
  * Redirects to unauthorized page if user doesn't have required role
  */
+// export const roleGuard = (allowedRoles: string[]): CanActivateFn => {...}
+// export const roleGuard: (roles: string[]) => CanActivateFn = (allowedRoles) => {...}
+
 export const roleGuard: (roles: string[]) => CanActivateFn = (allowedRoles) => {
   return (route, state) => {
     const authService = inject(AuthService);

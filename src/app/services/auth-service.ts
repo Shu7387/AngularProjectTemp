@@ -12,7 +12,7 @@ export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'current_user';
 
-  // Current user state
+  // Current logged-in user state
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -45,7 +45,7 @@ export class AuthService {
       catchError((error) => {
         console.error('❌ Login failed:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -145,7 +145,7 @@ export class AuthService {
       map(() => {
         // Find user
         const user = mockUsers.find(
-          (u) => u.username === credentials.username && u.password === credentials.password
+          (u) => u.username === credentials.username && u.password === credentials.password,
         );
 
         if (!user) {
@@ -169,7 +169,7 @@ export class AuthService {
         };
 
         return response;
-      })
+      }),
     );
   }
 
@@ -186,7 +186,7 @@ export class AuthService {
         role: user.role,
         iat: Date.now() / 1000,
         exp: Date.now() / 1000 + 3600, // 1 hour
-      })
+      }),
     );
     const signature = 'mock_signature';
 
