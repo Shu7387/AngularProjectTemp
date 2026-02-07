@@ -5,6 +5,7 @@ import { Patient } from '../../models/patient.model';
 import { PatientService } from '../../services/patient-service';
 import { LoggerService } from '../../services/logger-service';
 import { ActivatedRoute, Route, Router, RouterLink } from '@angular/router';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-edit-patient',
@@ -24,9 +25,7 @@ export class EditPatientComponent implements OnInit {
   editablePatient: Partial<Patient> = {};
   originalPatient: Patient | null = null;
 
-  // ✅ Converted to signal
   loading = signal(false);
-
   error: string | null = null;
   successMessage: string | null = null;
 
@@ -37,7 +36,7 @@ export class EditPatientComponent implements OnInit {
     private patientService: PatientService,
     private logger: LoggerService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {

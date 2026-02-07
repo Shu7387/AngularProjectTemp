@@ -40,7 +40,7 @@ export class PatientDetailComponent implements OnInit, OnChanges {
         'PatientDetailComponent: Patient changed from',
         changes['patient'].previousValue,
         'to',
-        changes['patient'].currentValue
+        changes['patient'].currentValue,
       );
     }
   }
